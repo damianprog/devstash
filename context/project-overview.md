@@ -26,16 +26,16 @@ A developer-first SaaS for storing code snippets, AI prompts, terminal commands,
 
 Developers keep their essentials scattered across too many tools:
 
-| Where it lives today            | What's stored there         |
-| ------------------------------- | --------------------------- |
-| VS Code / Notion                | Code snippets               |
-| AI chat histories               | Prompts & system messages   |
-| Buried project folders          | Context files               |
-| Browser bookmarks               | Useful links                |
-| Random directories              | Docs, cheatsheets           |
-| `.txt` files on the desktop     | Terminal commands           |
-| GitHub gists                    | Project templates           |
-| `~/.bash_history`               | Previously-used commands    |
+| Where it lives today        | What's stored there       |
+| --------------------------- | ------------------------- |
+| VS Code / Notion            | Code snippets             |
+| AI chat histories           | Prompts & system messages |
+| Buried project folders      | Context files             |
+| Browser bookmarks           | Useful links              |
+| Random directories          | Docs, cheatsheets         |
+| `.txt` files on the desktop | Terminal commands         |
+| GitHub gists                | Project templates         |
+| `~/.bash_history`           | Previously-used commands  |
 
 The result: constant context switching, lost knowledge, and inconsistent workflows.
 
@@ -58,21 +58,21 @@ The result: constant context switching, lost knowledge, and inconsistent workflo
 
 Items are the core unit of content. Each item has a **type** that determines how it's rendered and stored. Users can create custom types later (Pro), but the following system types ship out of the box and cannot be modified:
 
-| Type      | Storage | Plan       | Lucide Icon  | Color                    |
-| --------- | ------- | ---------- | ------------ | ------------------------ |
-| `snippet` | text    | Free & Pro | `Code`       | `#3b82f6` — blue         |
-| `prompt`  | text    | Free & Pro | `Sparkles`   | `#8b5cf6` — purple       |
-| `command` | text    | Free & Pro | `Terminal`   | `#f97316` — orange       |
-| `note`    | text    | Free & Pro | `StickyNote` | `#fde047` — yellow       |
-| `link`    | url     | Free & Pro | `Link`       | `#10b981` — emerald      |
-| `file`    | file    | **Pro**    | `File`       | `#6b7280` — gray         |
-| `image`   | file    | **Pro**    | `Image`      | `#ec4899` — pink         |
+| Type      | Storage | Plan       | Lucide Icon  | Color               |
+| --------- | ------- | ---------- | ------------ | ------------------- |
+| `snippet` | text    | Free & Pro | `Code`       | `#3b82f6` — blue    |
+| `prompt`  | text    | Free & Pro | `Sparkles`   | `#8b5cf6` — purple  |
+| `command` | text    | Free & Pro | `Terminal`   | `#f97316` — orange  |
+| `note`    | text    | Free & Pro | `StickyNote` | `#fde047` — yellow  |
+| `link`    | url     | Free & Pro | `Link`       | `#10b981` — emerald |
+| `file`    | file    | **Pro**    | `File`       | `#6b7280` — gray    |
+| `image`   | file    | **Pro**    | `Image`      | `#ec4899` — pink    |
 
 Each item's storage kind (text / file / url) is captured on the item itself via the `contentType` enum, making queries and rendering straightforward. Item creation and detail views open in a **quick-access drawer** — never a full page navigation.
 
 ### B. Collections
 
-Users can create collections that hold items of any type. **An item can belong to multiple collections** (e.g., a React snippet could live in both *"React Patterns"* and *"Interview Prep"*).
+Users can create collections that hold items of any type. **An item can belong to multiple collections** (e.g., a React snippet could live in both _"React Patterns"_ and _"Interview Prep"_).
 
 Example collections:
 
@@ -144,15 +144,15 @@ erDiagram
 
 ### Entity Summary
 
-| Entity             | Purpose                                                                |
-| ------------------ | ---------------------------------------------------------------------- |
-| **User**           | Extends NextAuth; tracks Pro status and Stripe IDs                     |
-| **Item**           | A single piece of stored content (snippet, prompt, file, link, etc.)   |
-| **ItemType**       | Either a system type (seeded) or a user-defined custom type            |
-| **Collection**     | A named group of items (many-to-many with Item)                        |
-| **ItemCollection** | Join table; stores `addedAt` for ordering                              |
-| **Tag**            | Per-user tag; many-to-many with Item                                   |
-| **ItemTag**        | Join table                                                             |
+| Entity             | Purpose                                                              |
+| ------------------ | -------------------------------------------------------------------- |
+| **User**           | Extends NextAuth; tracks Pro status and Stripe IDs                   |
+| **Item**           | A single piece of stored content (snippet, prompt, file, link, etc.) |
+| **ItemType**       | Either a system type (seeded) or a user-defined custom type          |
+| **Collection**     | A named group of items (many-to-many with Item)                      |
+| **ItemCollection** | Join table; stores `addedAt` for ordering                            |
+| **Tag**            | Per-user tag; many-to-many with Item                                 |
+| **ItemTag**        | Join table                                                           |
 
 ---
 
@@ -409,7 +409,7 @@ graph TB
 
 - **Neon** — serverless Postgres
 - **Prisma 7** (latest) — ORM & migrations
-- **Redis** — *possibly*, for caching hot queries (search, recents)
+- **Redis** — _possibly_, for caching hot queries (search, recents)
 
 ### Storage
 
@@ -441,20 +441,20 @@ graph TB
 
 Freemium. Pro tier infrastructure should be wired up from day one, but **during development all users have access to all features** (feature-flag the paywall).
 
-| Feature                 | Free           | Pro *($8/mo or $72/yr)*      |
-| ----------------------- | -------------- | ---------------------------- |
-| Total items             | 50             | Unlimited                    |
-| Collections             | 3              | Unlimited                    |
-| System item types       | All except file & image | All                  |
-| File & image uploads    | ❌             | ✅                           |
-| Custom types            | ❌             | ✅ *(planned, post-launch)*  |
-| Search                  | Basic          | Basic                        |
-| AI auto-tagging         | ❌             | ✅                           |
-| AI summaries            | ❌             | ✅                           |
-| AI "Explain this code"  | ❌             | ✅                           |
-| Prompt optimizer        | ❌             | ✅                           |
-| Export (JSON / ZIP)     | ❌             | ✅                           |
-| Support                 | Community      | Priority                     |
+| Feature                | Free                    | Pro _($8/mo or $72/yr)_     |
+| ---------------------- | ----------------------- | --------------------------- |
+| Total items            | 50                      | Unlimited                   |
+| Collections            | 3                       | Unlimited                   |
+| System item types      | All except file & image | All                         |
+| File & image uploads   | ❌                      | ✅                          |
+| Custom types           | ❌                      | ✅ _(planned, post-launch)_ |
+| Search                 | Basic                   | Basic                       |
+| AI auto-tagging        | ❌                      | ✅                          |
+| AI summaries           | ❌                      | ✅                          |
+| AI "Explain this code" | ❌                      | ✅                          |
+| Prompt optimizer       | ❌                      | ✅                          |
+| Export (JSON / ZIP)    | ❌                      | ✅                          |
+| Support                | Community               | Priority                    |
 
 ---
 
@@ -468,6 +468,13 @@ Freemium. Pro tier infrastructure should be wired up from day one, but **during 
 - Subtle borders and shadows
 - Syntax highlighting for code blocks
 - **References:** Notion, Linear, Raycast
+
+## Screenshots
+
+Refer to the screenshots below as a base for the dashboard UI. It does not have to be exact use it as a reference
+
+- @context/screenshots/dashboard-ui-main.png
+- @context/screenshots/dashboard-ui-drawer.png
 
 ### Layout
 
@@ -497,23 +504,23 @@ Freemium. Pro tier infrastructure should be wired up from day one, but **during 
 
 ## Routing Conventions
 
-| Route                                    | Purpose                                    |
-| ---------------------------------------- | ------------------------------------------ |
-| `/`                                      | Dashboard — collections grid               |
-| `/items`                                 | All items                                  |
-| `/items/snippets`                        | Items filtered by type (same for each type)|
-| `/items/prompts`                         | Prompts                                    |
-| `/items/commands`                        | Commands                                   |
-| `/items/notes`                           | Notes                                      |
-| `/items/links`                           | Links                                      |
-| `/items/files`                           | Files *(Pro)*                              |
-| `/items/images`                          | Images *(Pro)*                             |
-| `/collections/[id]`                      | Single collection view                     |
-| `/search`                                | Global search results                      |
-| `/settings`                              | Profile, billing, preferences              |
-| `/api/items`, `/api/collections`, etc.   | REST-ish API routes                        |
-| `/api/ai/*`                              | AI endpoints *(Pro-gated)*                 |
-| `/api/stripe/webhook`                    | Stripe webhook handler                     |
+| Route                                  | Purpose                                     |
+| -------------------------------------- | ------------------------------------------- |
+| `/`                                    | Dashboard — collections grid                |
+| `/items`                               | All items                                   |
+| `/items/snippets`                      | Items filtered by type (same for each type) |
+| `/items/prompts`                       | Prompts                                     |
+| `/items/commands`                      | Commands                                    |
+| `/items/notes`                         | Notes                                       |
+| `/items/links`                         | Links                                       |
+| `/items/files`                         | Files _(Pro)_                               |
+| `/items/images`                        | Images _(Pro)_                              |
+| `/collections/[id]`                    | Single collection view                      |
+| `/search`                              | Global search results                       |
+| `/settings`                            | Profile, billing, preferences               |
+| `/api/items`, `/api/collections`, etc. | REST-ish API routes                         |
+| `/api/ai/*`                            | AI endpoints _(Pro-gated)_                  |
+| `/api/stripe/webhook`                  | Stripe webhook handler                      |
 
 Item detail views open in a drawer overlaying whatever list the user is on — no dedicated `/items/[id]` route is required for day-to-day use (though one can exist for deep-linking).
 
