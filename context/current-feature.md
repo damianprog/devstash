@@ -4,17 +4,9 @@
 
 <!-- One of: Not Started | In Progress | Completed -->
 
-In Progress
+Completed
 
 ## Goals
-
-Dashboard UI Phase 3 — see @context/features/dashboard-phase-3-spec.md
-
-- Main area to the right
-- Recent collections
-- Pinned items
-- 10 recent items
-- 4 stats cards at the top: number of items, collections, favorite items, favorite collections (not in screenshot)
 
 ## Notes
 
@@ -28,3 +20,6 @@ Dashboard UI Phase 3 — see @context/features/dashboard-phase-3-spec.md
 - 2026-04-21 — Started Dashboard UI Phase 2 (spec loaded into current-feature).
 - 2026-04-21 — Completed Dashboard UI Phase 2.
 - 2026-04-21 — Started Dashboard UI Phase 3 (spec loaded into current-feature).
+- 2026-04-21 — Completed Dashboard UI Phase 3.
+- 2026-04-21 — Started Prisma + Neon PostgreSQL Setup (spec loaded into current-feature).
+- 2026-04-21 — Completed Prisma + Neon PostgreSQL Setup.
