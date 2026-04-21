@@ -21,7 +21,8 @@ import {
 } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
-import { itemTypeIcons } from "./itemTypeIcons";
+import { itemTypeIcons } from "@/lib/item-type-icons";
+
 import { useSidebar } from "./SidebarContext";
 
 type Group = "types" | "favorites" | "all";
