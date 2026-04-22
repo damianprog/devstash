@@ -29,6 +29,9 @@ type SeedItem = {
   url?: string;
   language?: string;
   tags?: string[];
+  isPinned?: boolean;
+  isFavorite?: boolean;
+  lastUsedDaysAgo?: number;
 };
 
 type SeedCollection = {
@@ -50,6 +53,9 @@ const collections: SeedCollection[] = [
         type: "snippet",
         language: "typescript",
         tags: ["react", "hooks"],
+        isPinned: true,
+        isFavorite: true,
+        lastUsedDaysAgo: 1,
         content: `import { useEffect, useState } from "react";
 
 export function useDebounce<T>(value: T, delay = 300): T {
@@ -99,6 +105,8 @@ export function useTheme() {
         type: "snippet",
         language: "typescript",
         tags: ["tailwind", "utility"],
+        isFavorite: true,
+        lastUsedDaysAgo: 4,
         content: `import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -118,6 +126,9 @@ export function cn(...inputs: ClassValue[]) {
         description: "Grouped findings by severity.",
         type: "prompt",
         tags: ["review", "quality"],
+        isPinned: true,
+        isFavorite: true,
+        lastUsedDaysAgo: 2,
         content: `You are an expert code reviewer. Review the following code for:
 
 - Correctness and potential bugs
@@ -153,6 +164,7 @@ Code:
         description: "Behavior-preserving refactor with per-change rationale.",
         type: "prompt",
         tags: ["refactor"],
+        lastUsedDaysAgo: 7,
         content: `Refactor the following code to improve readability and maintainability WITHOUT changing behavior.
 
 Rules:
@@ -240,6 +252,9 @@ pm2 reload ecosystem.config.cjs --update-env`,
         type: "command",
         language: "bash",
         tags: ["git"],
+        isPinned: true,
+        isFavorite: true,
+        lastUsedDaysAgo: 0,
         content: "git reset --soft HEAD~1",
       },
       {
@@ -255,6 +270,7 @@ pm2 reload ecosystem.config.cjs --update-env`,
         type: "command",
         language: "bash",
         tags: ["process"],
+        lastUsedDaysAgo: 3,
         content: "lsof -t -i:3000 | xargs -r kill -9",
       },
       {
@@ -262,6 +278,7 @@ pm2 reload ecosystem.config.cjs --update-env`,
         type: "command",
         language: "bash",
         tags: ["npm"],
+        lastUsedDaysAgo: 9,
         content: "rm -rf node_modules package-lock.json && npm install",
       },
     ],
@@ -277,6 +294,8 @@ pm2 reload ecosystem.config.cjs --update-env`,
         type: "link",
         url: "https://tailwindcss.com/docs",
         tags: ["css", "tailwind"],
+        isFavorite: true,
+        lastUsedDaysAgo: 5,
       },
       {
         title: "shadcn/ui",
@@ -284,6 +303,7 @@ pm2 reload ecosystem.config.cjs --update-env`,
         type: "link",
         url: "https://ui.shadcn.com",
         tags: ["components"],
+        lastUsedDaysAgo: 6,
       },
       {
         title: "Material Design 3",
@@ -298,6 +318,7 @@ pm2 reload ecosystem.config.cjs --update-env`,
         type: "link",
         url: "https://lucide.dev/icons",
         tags: ["icons"],
+        lastUsedDaysAgo: 11,
       },
     ],
   },
@@ -389,6 +410,11 @@ async function main() {
         tagIds.push(await upsertTag(tag));
       }
 
+      const lastUsedAt =
+        seedItem.lastUsedDaysAgo === undefined
+          ? null
+          : new Date(Date.now() - seedItem.lastUsedDaysAgo * 24 * 60 * 60 * 1000);
+
       await prisma.item.create({
         data: {
           title: seedItem.title,
@@ -397,6 +423,9 @@ async function main() {
           content: seedItem.content,
           url: seedItem.url,
           language: seedItem.language,
+          isPinned: seedItem.isPinned ?? false,
+          isFavorite: seedItem.isFavorite ?? false,
+          lastUsedAt,
           userId: user.id,
           itemTypeId: itemType.id,
           collections: { create: [{ collectionId: collection.id }] },
