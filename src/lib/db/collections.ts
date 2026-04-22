@@ -90,3 +90,70 @@ export async function getDashboardCollections(
     };
   });
 }
+
+export type SidebarCollection = {
+  id: string;
+  name: string;
+  isFavorite: boolean;
+  dominantTypeColor: string | null;
+};
+
+export type SidebarCollections = {
+  favorites: SidebarCollection[];
+  recents: SidebarCollection[];
+};
+
+export async function getSidebarCollections(
+  recentsLimit = 8,
+): Promise<SidebarCollections> {
+  const user = await prisma.user.findUnique({
+    where: { email: DEMO_EMAIL },
+    select: { id: true },
+  });
+  if (!user) return { favorites: [], recents: [] };
+
+  const collections = await prisma.collection.findMany({
+    where: { userId: user.id },
+    orderBy: { updatedAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      isFavorite: true,
+      defaultType: { select: { color: true } },
+      items: {
+        select: {
+          item: { select: { itemType: { select: { color: true } } } },
+        },
+      },
+    },
+  });
+
+  const mapped: SidebarCollection[] = collections.map((collection) => {
+    const colorCounts = new Map<string, number>();
+    for (const { item } of collection.items) {
+      const color = item.itemType.color;
+      colorCounts.set(color, (colorCounts.get(color) ?? 0) + 1);
+    }
+
+    let dominantTypeColor: string | null = collection.defaultType?.color ?? null;
+    let topCount = 0;
+    for (const [color, count] of colorCounts) {
+      if (count > topCount) {
+        topCount = count;
+        dominantTypeColor = color;
+      }
+    }
+
+    return {
+      id: collection.id,
+      name: collection.name,
+      isFavorite: collection.isFavorite,
+      dominantTypeColor,
+    };
+  });
+
+  const favorites = mapped.filter((c) => c.isFavorite);
+  const recents = mapped.filter((c) => !c.isFavorite).slice(0, recentsLimit);
+
+  return { favorites, recents };
+}
