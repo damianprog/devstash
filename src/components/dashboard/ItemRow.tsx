@@ -2,15 +2,12 @@ import { HelpCircle, Pin, Star } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { type DashboardItem } from "@/lib/db/items";
 import { itemTypeIcons } from "@/lib/item-type-icons";
-import { mockItemTypes, type MockItem } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
-const typeById = new Map(mockItemTypes.map((type) => [type.id, type]));
-
-function formatShortDate(iso: string | null) {
-  if (!iso) return null;
-  const date = new Date(iso);
+function formatShortDate(date: Date | null) {
+  if (!date) return null;
   return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -21,15 +18,14 @@ export function ItemRow({
   item,
   dateLabel = "created",
 }: {
-  item: MockItem;
+  item: DashboardItem;
   dateLabel?: "created" | "lastUsed";
 }) {
-  const type = typeById.get(item.itemTypeId);
-  const Icon = type ? (itemTypeIcons[type.icon] ?? HelpCircle) : HelpCircle;
-  const accent = type?.color ?? "var(--border)";
+  const Icon = itemTypeIcons[item.itemType.icon] ?? HelpCircle;
+  const accent = item.itemType.color;
 
-  const dateIso = dateLabel === "lastUsed" ? item.lastUsedAt : item.createdAt;
-  const formattedDate = formatShortDate(dateIso);
+  const date = dateLabel === "lastUsed" ? item.lastUsedAt : item.createdAt;
+  const formattedDate = formatShortDate(date);
 
   return (
     <Card

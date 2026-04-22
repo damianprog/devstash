@@ -1,12 +1,12 @@
 import { Pin } from "lucide-react";
 
-import { mockItems } from "@/lib/mock-data";
+import { getPinnedItems } from "@/lib/db/items";
 
 import { ItemRow } from "./ItemRow";
 
-const pinnedItems = mockItems.filter((item) => item.isPinned);
+export async function PinnedItems() {
+  const pinnedItems = await getPinnedItems();
 
-export function PinnedItems() {
   if (pinnedItems.length === 0) return null;
 
   return (

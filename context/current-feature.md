@@ -1,4 +1,4 @@
-# Dashboard Collections
+# Dashboard Items
 
 ## Status
 
@@ -8,22 +8,21 @@ Completed
 
 ## Overview
 
-Replace the dummy collection data displayed in the main area of the dashboard (right side), with actual data from the database. It should look how it does now with the 6 cards of recent collections, but instead of using data from `@src/lib/mock-data.ts`, it should be from our Neon database using Prisma.
+Replace the dummy item data displayed in the main area of the dashboard (right side), with actual data from the database. This includes both pinned and recent items. It should look how it does now, but instead of using data from @src/lib/mock-data.ts, it should be from our Neon database using Prisma.
 
-Do not add the items underneath yet. We will do that later.
+If there are no pinned items, nothing should display there.
 
 ## Requirements
 
-- Create `src/lib/db/collections.ts` with data fetching functions
-- Fetch collections directly in server component
-- Collection card border color derived from most-used content type in that collection
-- Show small icons of all types in that collection
-- Keep the current design. You can also reference the screenshot
+- Create src/lib/db/items.ts with data fetching functions
+- Fetch items directly in server component
+- item card icon/border derived from the item type
+- Display item type tags and anything else currently there. You can also reference the screenshot if needed
 - Update collection stats display
 
 ## References
 
-- Spec: `@context/features/dashboard-collections-spec.md`.
+- Spec: `@context/features/dashboard-items-spec.md`.
 - Check the `@context/screenshots/dashboard-ui-main.png` screenshot if needed, but layout and design is already there.
 
 ## History
@@ -43,3 +42,5 @@ Do not add the items underneath yet. We will do that later.
 - 2026-04-22 — Completed Seed Data.
 - 2026-04-22 — Started Dashboard Collections (spec loaded into current-feature).
 - 2026-04-22 — Completed Dashboard Collections.
+- 2026-04-22 — Started Dashboard Items (spec loaded into current-feature).
+- 2026-04-22 — Completed Dashboard Items.

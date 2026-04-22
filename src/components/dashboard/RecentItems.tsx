@@ -1,18 +1,12 @@
 import { Clock } from "lucide-react";
 
-import { mockItems } from "@/lib/mock-data";
+import { getRecentItems } from "@/lib/db/items";
 
 import { ItemRow } from "./ItemRow";
 
-const recentItems = [...mockItems]
-  .filter((item) => item.lastUsedAt)
-  .sort(
-    (a, b) =>
-      new Date(b.lastUsedAt!).getTime() - new Date(a.lastUsedAt!).getTime(),
-  )
-  .slice(0, 10);
+export async function RecentItems() {
+  const recentItems = await getRecentItems(10);
 
-export function RecentItems() {
   if (recentItems.length === 0) return null;
 
   return (
