@@ -1,4 +1,4 @@
-# Dashboard Items
+# Stats & Sidebar
 
 ## Status
 
@@ -8,22 +8,22 @@ Completed
 
 ## Overview
 
-Replace the dummy item data displayed in the main area of the dashboard (right side), with actual data from the database. This includes both pinned and recent items. It should look how it does now, but instead of using data from @src/lib/mock-data.ts, it should be from our Neon database using Prisma.
+Show the stats in the main area from the data in the database instead of the @src/lib/mock-data.ts file.
 
-If there are no pinned items, nothing should display there.
+Show the system item types in the sidebar and the actual collection data from the database.
 
 ## Requirements
 
-- Create src/lib/db/items.ts with data fetching functions
-- Fetch items directly in server component
-- item card icon/border derived from the item type
-- Display item type tags and anything else currently there. You can also reference the screenshot if needed
-- Update collection stats display
+- Display stats pertaining to database data, keeping the current design/layout
+- Display item types in sidebar with their icons, linking to /items/[typename]
+- Add "View all collections" link under the collections list that goes to /collections
+- Keep the star icons for favorite collections but for recents, each collection should show a colored circle based on the most-used item type in that collection
+- Create @src/lib/db/items.ts and add the database functions. Use the collections file for reference if needed
 
 ## References
 
-- Spec: `@context/features/dashboard-items-spec.md`.
-- Check the `@context/screenshots/dashboard-ui-main.png` screenshot if needed, but layout and design is already there.
+- Spec: `@context/features/stats-sidebar-spec.md`.
+- Reference: `@src/lib/db/collections.ts`.
 
 ## History
 
@@ -44,3 +44,5 @@ If there are no pinned items, nothing should display there.
 - 2026-04-22 — Completed Dashboard Collections.
 - 2026-04-22 — Started Dashboard Items (spec loaded into current-feature).
 - 2026-04-22 — Completed Dashboard Items.
+- 2026-04-22 — Started Stats & Sidebar (spec loaded into current-feature).
+- 2026-04-22 — Completed Stats & Sidebar.

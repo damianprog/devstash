@@ -97,3 +97,49 @@ export async function getRecentItems(limit = 10): Promise<DashboardItem[]> {
 
   return items.map(toDashboardItem);
 }
+
+export type SidebarItemType = {
+  id: string;
+  name: string;
+  label: string;
+  icon: string;
+  color: string;
+  count: number;
+};
+
+function pluralLabel(name: string): string {
+  return name.charAt(0).toUpperCase() + name.slice(1) + "s";
+}
+
+export async function getSidebarItemTypes(): Promise<SidebarItemType[]> {
+  const userId = await getDemoUserId();
+
+  const systemTypes = await prisma.itemType.findMany({
+    where: { isSystem: true, userId: null },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, name: true, icon: true, color: true },
+  });
+
+  if (!userId) {
+    return systemTypes.map((type) => ({
+      ...type,
+      label: pluralLabel(type.name),
+      count: 0,
+    }));
+  }
+
+  const counts = await prisma.item.groupBy({
+    by: ["itemTypeId"],
+    where: { userId },
+    _count: { _all: true },
+  });
+  const countByTypeId = new Map(
+    counts.map((c) => [c.itemTypeId, c._count._all]),
+  );
+
+  return systemTypes.map((type) => ({
+    ...type,
+    label: pluralLabel(type.name),
+    count: countByTypeId.get(type.id) ?? 0,
+  }));
+}

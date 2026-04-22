@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { ChevronDown, Folder, HelpCircle, Settings, Star } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Folder,
+  HelpCircle,
+  Settings,
+  Star,
+} from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -13,32 +20,36 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  mockCollections,
-  mockItemTypes,
-  mockUser,
-  type MockCollection,
-} from "@/lib/mock-data";
+import type {
+  SidebarCollection,
+  SidebarCollections,
+} from "@/lib/db/collections";
+import type { SidebarItemType } from "@/lib/db/items";
+import { mockUser } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 import { itemTypeIcons } from "@/lib/item-type-icons";
 
 import { useSidebar } from "./SidebarContext";
 
-type Group = "types" | "favorites" | "all";
+type Group = "types" | "collections";
 
-const favoriteCollections = mockCollections.filter((c) => c.isFavorite);
-const recentCollections = mockCollections.filter((c) => !c.isFavorite);
-
-export function SidebarContent({ variant }: { variant: "desktop" | "mobile" }) {
+export function SidebarContent({
+  variant,
+  itemTypes,
+  collections,
+}: {
+  variant: "desktop" | "mobile";
+  itemTypes: SidebarItemType[];
+  collections: SidebarCollections;
+}) {
   const { isCollapsed, setMobileOpen } = useSidebar();
   const collapsed = variant === "desktop" && isCollapsed;
   const pathname = usePathname();
 
   const [openGroups, setOpenGroups] = useState<Record<Group, boolean>>({
     types: true,
-    favorites: true,
-    all: true,
+    collections: true,
   });
 
   const toggleGroup = (group: Group) =>
@@ -47,6 +58,8 @@ export function SidebarContent({ variant }: { variant: "desktop" | "mobile" }) {
   const handleNavigate = () => {
     if (variant === "mobile") setMobileOpen(false);
   };
+
+  const { favorites, recents } = collections;
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
@@ -59,7 +72,7 @@ export function SidebarContent({ variant }: { variant: "desktop" | "mobile" }) {
           onToggle={() => toggleGroup("types")}
           collapsed={collapsed}
         >
-          {mockItemTypes.map((type) => {
+          {itemTypes.map((type) => {
             const Icon = itemTypeIcons[type.icon] ?? HelpCircle;
             const href = `/items/${type.name}s`;
             const active = pathname === href;
@@ -69,7 +82,7 @@ export function SidebarContent({ variant }: { variant: "desktop" | "mobile" }) {
                 href={href}
                 label={type.label}
                 icon={<Icon style={{ color: type.color }} />}
-                trailing={<Count value={type.itemCount} />}
+                trailing={<Count value={type.count} />}
                 active={active}
                 collapsed={collapsed}
                 onNavigate={handleNavigate}
@@ -82,23 +95,16 @@ export function SidebarContent({ variant }: { variant: "desktop" | "mobile" }) {
 
         <SidebarGroup
           title="Collections"
-          open={openGroups.favorites || openGroups.all}
-          onToggle={() => {
-            const next = !(openGroups.favorites && openGroups.all);
-            setOpenGroups((prev) => ({
-              ...prev,
-              favorites: next,
-              all: next,
-            }));
-          }}
+          open={openGroups.collections}
+          onToggle={() => toggleGroup("collections")}
           collapsed={collapsed}
         >
-          {favoriteCollections.length > 0 && (
+          {favorites.length > 0 && (
             <SidebarSubheading collapsed={collapsed}>
               Favorites
             </SidebarSubheading>
           )}
-          {favoriteCollections.map((collection) => (
+          {favorites.map((collection) => (
             <CollectionLink
               key={collection.id}
               collection={collection}
@@ -109,12 +115,12 @@ export function SidebarContent({ variant }: { variant: "desktop" | "mobile" }) {
             />
           ))}
 
-          {recentCollections.length > 0 && (
+          {recents.length > 0 && (
             <SidebarSubheading collapsed={collapsed} className="mt-2">
-              All collections
+              Recent
             </SidebarSubheading>
           )}
-          {recentCollections.map((collection) => (
+          {recents.map((collection) => (
             <CollectionLink
               key={collection.id}
               collection={collection}
@@ -123,6 +129,12 @@ export function SidebarContent({ variant }: { variant: "desktop" | "mobile" }) {
               onNavigate={handleNavigate}
             />
           ))}
+
+          <ViewAllCollectionsLink
+            collapsed={collapsed}
+            active={pathname === "/collections"}
+            onNavigate={handleNavigate}
+          />
         </SidebarGroup>
       </div>
 
@@ -266,7 +278,7 @@ function CollectionLink({
   onNavigate,
   showStar = false,
 }: {
-  collection: MockCollection;
+  collection: SidebarCollection;
   pathname: string;
   collapsed: boolean;
   onNavigate?: () => void;
@@ -274,22 +286,62 @@ function CollectionLink({
 }) {
   const href = `/collections/${collection.id}`;
   const active = pathname === href;
+  const icon = showStar ? (
+    <Folder className="text-muted-foreground" />
+  ) : (
+    <TypeColorDot color={collection.dominantTypeColor} />
+  );
+
   return (
     <SidebarLink
       href={href}
       label={collection.name}
-      icon={<Folder className="text-muted-foreground" />}
+      icon={icon}
       trailing={
         showStar ? (
           <Star className="size-3.5 fill-yellow-400 text-yellow-400" />
-        ) : (
-          <Count value={collection.itemCount} />
-        )
+        ) : undefined
       }
       active={active}
       collapsed={collapsed}
       onNavigate={onNavigate}
     />
+  );
+}
+
+function TypeColorDot({ color }: { color: string | null }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="block size-2.5 rounded-full"
+      style={{ backgroundColor: color ?? "var(--muted-foreground)" }}
+    />
+  );
+}
+
+function ViewAllCollectionsLink({
+  collapsed,
+  active,
+  onNavigate,
+}: {
+  collapsed: boolean;
+  active: boolean;
+  onNavigate?: () => void;
+}) {
+  if (collapsed) return null;
+  return (
+    <Link
+      href="/collections"
+      onClick={onNavigate}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "mt-1 flex h-7 items-center gap-1 rounded-md px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground",
+        active && "bg-sidebar-accent text-foreground",
+      )}
+    >
+      <span>View all collections</span>
+      <ChevronRight className="size-3.5" />
+    </Link>
   );
 }
 
