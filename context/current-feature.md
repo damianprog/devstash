@@ -1,27 +1,30 @@
-# Seed Data
+# Dashboard Collections
 
 ## Status
 
 <!-- One of: Not Started | In Progress | Completed -->
 
-In Progress
+Completed
 
-## Goals
+## Overview
 
-- Rewrite `prisma/seed.ts` to populate dev database with realistic sample data
-- Seed demo user: `demo@devstash.io` / `Demo User` / password `12345678` (bcryptjs, 12 rounds), `isPro: false`, `emailVerified: now`
-- Keep seeding 7 system ItemTypes (snippet, prompt, command, note, file, image, link) with `isSystem: true`
-- Seed 5 collections with their items:
-  - **React Patterns** — 3 TypeScript snippets (hooks, component patterns, utilities)
-  - **AI Workflows** — 3 prompts (code review, doc generation, refactoring)
-  - **DevOps** — 1 snippet (Docker/CI), 1 command (deploy script), 2 links (real URLs)
-  - **Terminal Commands** — 4 commands (git, docker, process mgmt, package manager)
-  - **Design Resources** — 4 links (CSS/Tailwind, component libs, design systems, icons — real URLs)
+Replace the dummy collection data displayed in the main area of the dashboard (right side), with actual data from the database. It should look how it does now with the 6 cards of recent collections, but instead of using data from `@src/lib/mock-data.ts`, it should be from our Neon database using Prisma.
 
-## Notes
+Do not add the items underneath yet. We will do that later.
 
-- Seed script must stay idempotent — can be re-run without duplicating data.
-- Spec: `@context/features/seed-spec.md`.
+## Requirements
+
+- Create `src/lib/db/collections.ts` with data fetching functions
+- Fetch collections directly in server component
+- Collection card border color derived from most-used content type in that collection
+- Show small icons of all types in that collection
+- Keep the current design. You can also reference the screenshot
+- Update collection stats display
+
+## References
+
+- Spec: `@context/features/dashboard-collections-spec.md`.
+- Check the `@context/screenshots/dashboard-ui-main.png` screenshot if needed, but layout and design is already there.
 
 ## History
 
@@ -37,3 +40,6 @@ In Progress
 - 2026-04-21 — Started Prisma + Neon PostgreSQL Setup (spec loaded into current-feature).
 - 2026-04-21 — Completed Prisma + Neon PostgreSQL Setup.
 - 2026-04-21 — Started Seed Data (spec loaded into current-feature).
+- 2026-04-22 — Completed Seed Data.
+- 2026-04-22 — Started Dashboard Collections (spec loaded into current-feature).
+- 2026-04-22 — Completed Dashboard Collections.
