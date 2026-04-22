@@ -1,36 +1,22 @@
-"use client";
-
 import Link from "next/link";
-import { HelpCircle, MoreHorizontal, Star } from "lucide-react";
+import { HelpCircle, Star } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { itemTypeIcons } from "@/lib/item-type-icons";
 import {
-  mockCollections,
-  mockItems,
-  mockItemTypes,
-  type MockCollection,
-  type MockItemType,
-} from "@/lib/mock-data";
+  getDashboardCollections,
+  type DashboardCollection,
+  type DashboardCollectionDefaultType,
+  type DashboardCollectionType,
+} from "@/lib/db/collections";
+import { itemTypeIcons } from "@/lib/item-type-icons";
 
-const typeById = new Map(mockItemTypes.map((type) => [type.id, type]));
+import { CollectionCardMenu } from "./CollectionCardMenu";
 
-function getCollectionTypes(collection: MockCollection): MockItemType[] {
-  const typeIds = new Set<string>();
-  for (const item of mockItems) {
-    if (item.collectionIds.includes(collection.id)) {
-      typeIds.add(item.itemTypeId);
-    }
-  }
-  if (typeIds.size === 0) typeIds.add(collection.defaultTypeId);
+export async function CollectionsGrid() {
+  const collections = await getDashboardCollections(6);
 
-  return [...typeIds]
-    .map((id) => typeById.get(id))
-    .filter((t): t is MockItemType => Boolean(t));
-}
+  if (collections.length === 0) return null;
 
-export function CollectionsGrid() {
   return (
     <section className="space-y-3">
       <div className="flex items-end justify-between">
@@ -46,7 +32,7 @@ export function CollectionsGrid() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {mockCollections.map((collection) => (
+        {collections.map((collection) => (
           <CollectionCard key={collection.id} collection={collection} />
         ))}
       </div>
@@ -54,10 +40,16 @@ export function CollectionsGrid() {
   );
 }
 
-function CollectionCard({ collection }: { collection: MockCollection }) {
-  const defaultType = typeById.get(collection.defaultTypeId);
-  const types = getCollectionTypes(collection);
-  const accent = defaultType?.color ?? "var(--border)";
+function CollectionCard({ collection }: { collection: DashboardCollection }) {
+  const dominantType = collection.types[0] ?? collection.defaultType;
+  const accent = dominantType?.color ?? "var(--border)";
+
+  const iconTypes: Array<DashboardCollectionType | DashboardCollectionDefaultType> =
+    collection.types.length > 0
+      ? collection.types
+      : collection.defaultType
+        ? [collection.defaultType]
+        : [];
 
   return (
     <Link href={`/collections/${collection.id}`} className="block">
@@ -81,17 +73,7 @@ function CollectionCard({ collection }: { collection: MockCollection }) {
               {collection.itemCount === 1 ? "" : "s"}
             </p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            aria-label="Collection options"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          >
-            <MoreHorizontal />
-          </Button>
+          <CollectionCardMenu />
         </div>
 
         {collection.description && (
@@ -100,18 +82,20 @@ function CollectionCard({ collection }: { collection: MockCollection }) {
           </p>
         )}
 
-        <div className="flex items-center gap-2 px-4">
-          {types.map((type) => {
-            const Icon = itemTypeIcons[type.icon] ?? HelpCircle;
-            return (
-              <Icon
-                key={type.id}
-                className="size-3.5"
-                style={{ color: type.color }}
-              />
-            );
-          })}
-        </div>
+        {iconTypes.length > 0 && (
+          <div className="flex items-center gap-2 px-4">
+            {iconTypes.map((type) => {
+              const Icon = itemTypeIcons[type.icon] ?? HelpCircle;
+              return (
+                <Icon
+                  key={type.id}
+                  className="size-3.5"
+                  style={{ color: type.color }}
+                />
+              );
+            })}
+          </div>
+        )}
       </Card>
     </Link>
   );
