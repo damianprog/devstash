@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -33,6 +34,8 @@ import { itemTypeIcons } from "@/lib/item-type-icons";
 import { useSidebar } from "./SidebarContext";
 
 type Group = "types" | "collections";
+
+const PRO_TYPE_NAMES = new Set(["file", "image"]);
 
 export function SidebarContent({
   variant,
@@ -76,13 +79,19 @@ export function SidebarContent({
             const Icon = itemTypeIcons[type.icon] ?? HelpCircle;
             const href = `/items/${type.name}s`;
             const active = pathname === href;
+            const isPro = PRO_TYPE_NAMES.has(type.name);
             return (
               <SidebarLink
                 key={type.id}
                 href={href}
                 label={type.label}
                 icon={<Icon style={{ color: type.color }} />}
-                trailing={<Count value={type.count} />}
+                trailing={
+                  <span className="flex items-center gap-1.5">
+                    {isPro && <ProBadge />}
+                    <Count value={type.count} />
+                  </span>
+                }
                 active={active}
                 collapsed={collapsed}
                 onNavigate={handleNavigate}
@@ -348,6 +357,17 @@ function ViewAllCollectionsLink({
 function Count({ value }: { value: number }) {
   return (
     <span className="text-xs tabular-nums text-muted-foreground">{value}</span>
+  );
+}
+
+function ProBadge() {
+  return (
+    <Badge
+      variant="secondary"
+      className="h-4 px-1.5 text-[9px] font-semibold tracking-wider text-muted-foreground"
+    >
+      PRO
+    </Badge>
   );
 }
 
