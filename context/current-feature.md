@@ -1,29 +1,22 @@
-# Stats & Sidebar
+# Current Feature
 
 ## Status
 
 <!-- One of: Not Started | In Progress | Completed -->
 
-Completed
+Not Started
 
 ## Overview
 
-Show the stats in the main area from the data in the database instead of the @src/lib/mock-data.ts file.
-
-Show the system item types in the sidebar and the actual collection data from the database.
+<!-- What this feature is about -->
 
 ## Requirements
 
-- Display stats pertaining to database data, keeping the current design/layout
-- Display item types in sidebar with their icons, linking to /items/[typename]
-- Add "View all collections" link under the collections list that goes to /collections
-- Keep the star icons for favorite collections but for recents, each collection should show a colored circle based on the most-used item type in that collection
-- Create @src/lib/db/items.ts and add the database functions. Use the collections file for reference if needed
+<!-- Bullet points of what success looks like -->
 
 ## References
 
-- Spec: `@context/features/stats-sidebar-spec.md`.
-- Reference: `@src/lib/db/collections.ts`.
+<!-- Links to spec files, related docs, etc. -->
 
 ## History
 
@@ -46,3 +39,5 @@ Show the system item types in the sidebar and the actual collection data from th
 - 2026-04-22 — Completed Dashboard Items.
 - 2026-04-22 — Started Stats & Sidebar (spec loaded into current-feature).
 - 2026-04-22 — Completed Stats & Sidebar.
+- 2026-04-26 — Loaded Add Pro Badge to Sidebar spec into current-feature.
+- 2026-04-26 — Completed Add Pro Badge to Sidebar.
