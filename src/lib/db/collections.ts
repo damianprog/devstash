@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
-
-const DEMO_EMAIL = "demo@devstash.io";
+import { getDemoUserId } from "@/lib/db/demo-user";
 
 export type DashboardCollectionType = {
   id: string;
@@ -30,14 +29,10 @@ export type DashboardCollection = {
 export async function getDashboardCollections(
   limit = 6,
 ): Promise<DashboardCollection[]> {
-  const user = await prisma.user.findUnique({
-    where: { email: DEMO_EMAIL },
-    select: { id: true },
-  });
-  if (!user) return [];
+  const userId = await getDemoUserId();
 
   const collections = await prisma.collection.findMany({
-    where: { userId: user.id },
+    where: { userId },
     orderBy: { updatedAt: "desc" },
     take: limit,
     include: {
@@ -46,6 +41,7 @@ export async function getDashboardCollections(
         select: { id: true, name: true, icon: true, color: true },
       },
       items: {
+        take: 100,
         select: {
           item: {
             select: {
@@ -103,57 +99,71 @@ export type SidebarCollections = {
   recents: SidebarCollection[];
 };
 
+const sidebarCollectionSelect = {
+  id: true,
+  name: true,
+  isFavorite: true,
+  defaultType: { select: { color: true } },
+  items: {
+    select: {
+      item: { select: { itemType: { select: { color: true } } } },
+    },
+  },
+} as const;
+
+type SidebarCollectionRow = {
+  id: string;
+  name: string;
+  isFavorite: boolean;
+  defaultType: { color: string } | null;
+  items: { item: { itemType: { color: string } } }[];
+};
+
+function toSidebarCollection(collection: SidebarCollectionRow): SidebarCollection {
+  const colorCounts = new Map<string, number>();
+  for (const { item } of collection.items) {
+    const color = item.itemType.color;
+    colorCounts.set(color, (colorCounts.get(color) ?? 0) + 1);
+  }
+
+  let dominantTypeColor: string | null = collection.defaultType?.color ?? null;
+  let topCount = 0;
+  for (const [color, count] of colorCounts) {
+    if (count > topCount) {
+      topCount = count;
+      dominantTypeColor = color;
+    }
+  }
+
+  return {
+    id: collection.id,
+    name: collection.name,
+    isFavorite: collection.isFavorite,
+    dominantTypeColor,
+  };
+}
+
 export async function getSidebarCollections(
   recentsLimit = 8,
 ): Promise<SidebarCollections> {
-  const user = await prisma.user.findUnique({
-    where: { email: DEMO_EMAIL },
-    select: { id: true },
-  });
-  if (!user) return { favorites: [], recents: [] };
+  const userId = await getDemoUserId();
 
-  const collections = await prisma.collection.findMany({
-    where: { userId: user.id },
-    orderBy: { updatedAt: "desc" },
-    select: {
-      id: true,
-      name: true,
-      isFavorite: true,
-      defaultType: { select: { color: true } },
-      items: {
-        select: {
-          item: { select: { itemType: { select: { color: true } } } },
-        },
-      },
-    },
-  });
+  const [favoriteRows, recentRows] = await Promise.all([
+    prisma.collection.findMany({
+      where: { userId, isFavorite: true },
+      orderBy: { updatedAt: "desc" },
+      select: sidebarCollectionSelect,
+    }),
+    prisma.collection.findMany({
+      where: { userId, isFavorite: false },
+      orderBy: { updatedAt: "desc" },
+      take: recentsLimit,
+      select: sidebarCollectionSelect,
+    }),
+  ]);
 
-  const mapped: SidebarCollection[] = collections.map((collection) => {
-    const colorCounts = new Map<string, number>();
-    for (const { item } of collection.items) {
-      const color = item.itemType.color;
-      colorCounts.set(color, (colorCounts.get(color) ?? 0) + 1);
-    }
-
-    let dominantTypeColor: string | null = collection.defaultType?.color ?? null;
-    let topCount = 0;
-    for (const [color, count] of colorCounts) {
-      if (count > topCount) {
-        topCount = count;
-        dominantTypeColor = color;
-      }
-    }
-
-    return {
-      id: collection.id,
-      name: collection.name,
-      isFavorite: collection.isFavorite,
-      dominantTypeColor,
-    };
-  });
-
-  const favorites = mapped.filter((c) => c.isFavorite);
-  const recents = mapped.filter((c) => !c.isFavorite).slice(0, recentsLimit);
-
-  return { favorites, recents };
+  return {
+    favorites: favoriteRows.map(toSidebarCollection),
+    recents: recentRows.map(toSidebarCollection),
+  };
 }
