@@ -331,22 +331,10 @@ function contentTypeFor(type: SeedItem["type"]): ContentType {
 }
 
 async function upsertSystemItemTypes(prisma: PrismaClient) {
-  for (const type of systemItemTypes) {
-    const existing = await prisma.itemType.findFirst({
-      where: { name: type.name, isSystem: true, userId: null },
-    });
-
-    if (existing) {
-      await prisma.itemType.update({
-        where: { id: existing.id },
-        data: { icon: type.icon, color: type.color },
-      });
-    } else {
-      await prisma.itemType.create({
-        data: { ...type, isSystem: true },
-      });
-    }
-  }
+  await prisma.itemType.createMany({
+    data: systemItemTypes.map((type) => ({ ...type, isSystem: true })),
+    skipDuplicates: true,
+  });
 }
 
 async function main() {

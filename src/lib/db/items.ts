@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
-
-const DEMO_EMAIL = "demo@devstash.io";
+import { getDemoUserId } from "@/lib/db/demo-user";
 
 export type DashboardItemType = {
   id: string;
@@ -63,17 +62,8 @@ function toDashboardItem(item: RawItem): DashboardItem {
   };
 }
 
-async function getDemoUserId(): Promise<string | null> {
-  const user = await prisma.user.findUnique({
-    where: { email: DEMO_EMAIL },
-    select: { id: true },
-  });
-  return user?.id ?? null;
-}
-
 export async function getPinnedItems(): Promise<DashboardItem[]> {
   const userId = await getDemoUserId();
-  if (!userId) return [];
 
   const items = await prisma.item.findMany({
     where: { userId, isPinned: true },
@@ -86,7 +76,6 @@ export async function getPinnedItems(): Promise<DashboardItem[]> {
 
 export async function getRecentItems(limit = 10): Promise<DashboardItem[]> {
   const userId = await getDemoUserId();
-  if (!userId) return [];
 
   const items = await prisma.item.findMany({
     where: { userId, lastUsedAt: { not: null } },
@@ -119,14 +108,6 @@ export async function getSidebarItemTypes(): Promise<SidebarItemType[]> {
     orderBy: { createdAt: "asc" },
     select: { id: true, name: true, icon: true, color: true },
   });
-
-  if (!userId) {
-    return systemTypes.map((type) => ({
-      ...type,
-      label: pluralLabel(type.name),
-      count: 0,
-    }));
-  }
 
   const counts = await prisma.item.groupBy({
     by: ["itemTypeId"],

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { mockItemTypes } from "@/lib/mock-data";
+import { getSidebarItemTypes } from "@/lib/db/items";
 
 type Params = { type: string };
 
@@ -10,7 +10,8 @@ export default async function ItemsByTypePage({
   params: Promise<Params>;
 }) {
   const { type } = await params;
-  const itemType = mockItemTypes.find((t) => `${t.name}s` === type);
+  const itemTypes = await getSidebarItemTypes();
+  const itemType = itemTypes.find((t) => `${t.name}s` === type);
 
   if (!itemType) notFound();
 
@@ -20,7 +21,7 @@ export default async function ItemsByTypePage({
         {itemType.label}
       </h1>
       <p className="text-sm text-muted-foreground">
-        {itemType.itemCount} item{itemType.itemCount === 1 ? "" : "s"}
+        {itemType.count} item{itemType.count === 1 ? "" : "s"}
       </p>
     </div>
   );
